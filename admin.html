@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>智学 · 管理后台</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0b1020; --card: rgba(255,255,255,.055); --line: rgba(255,255,255,.10);
+    --txt: #e8ecf6; --sub: #8b93ad; --pri: #6f8dff; --pri2: #a678ff;
+    --red: #ff6b6b; --green: #4ade80; --amber: #fbbf24;
+  }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: radial-gradient(1200px 600px at 15% -10%, rgba(111,141,255,.22), transparent 60%),
+                radial-gradient(1000px 500px at 110% 10%, rgba(166,120,255,.16), transparent 55%), var(--bg);
+    color: var(--txt); min-height: 100vh; padding: 22px;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+  .logo { width: 42px; height: 42px; border-radius: 13px; display: grid; place-items: center; font-size: 22px;
+    background: linear-gradient(135deg, var(--pri), var(--pri2)); box-shadow: 0 6px 22px rgba(111,141,255,.35); }
+  header h1 { font-size: 19px; font-weight: 800; }
+  header .tag { font-size: 11px; color: var(--sub); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; }
+  .nav { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+  .nav button {
+    background: var(--card); border: 1px solid var(--line); color: var(--sub);
+    padding: 8px 16px; border-radius: 999px; font-size: 13px; cursor: pointer; transition: .18s;
+  }
+  .nav button:hover { color: var(--txt); }
+  .nav button.on { background: linear-gradient(135deg, var(--pri), var(--pri2)); color: #fff; border-color: transparent; font-weight: 700; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 18px; backdrop-filter: blur(18px); }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 18px; }
+  .stat { padding: 15px 16px; }
+  .stat .k { font-size: 11px; color: var(--sub); margin-bottom: 6px; }
+  .stat .v { font-size: 26px; font-weight: 900; background: linear-gradient(135deg, #fff, #b7c3ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .stat .d { font-size: 10.5px; color: var(--sub); margin-top: 4px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th { text-align: left; color: var(--sub); font-weight: 600; padding: 9px 10px; border-bottom: 1px solid var(--line); font-size: 11.5px; white-space: nowrap; }
+  td { padding: 11px 10px; border-bottom: 1px solid rgba(255,255,255,.05); vertical-align: middle; }
+  tr:hover td { background: rgba(255,255,255,.025); }
+  .pill { display: inline-block; font-size: 10.5px; padding: 2.5px 9px; border-radius: 999px; font-weight: 700; }
+  .pill.ok { background: rgba(74,222,128,.14); color: var(--green); }
+  .pill.ban { background: rgba(255,107,107,.14); color: var(--red); }
+  .pill.adm { background: rgba(111,141,255,.18); color: var(--pri); }
+  .btn { border: 1px solid var(--line); background: rgba(255,255,255,.06); color: var(--txt);
+    font-size: 11.5px; padding: 5px 11px; border-radius: 8px; cursor: pointer; transition: .15s; white-space: nowrap; }
+  .btn:hover { background: rgba(255,255,255,.12); }
+  .btn.pri { background: linear-gradient(135deg, var(--pri), var(--pri2)); border-color: transparent; font-weight: 700; }
+  .btn.red { color: var(--red); border-color: rgba(255,107,107,.35); }
+  .btn.red:hover { background: rgba(255,107,107,.14); }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  input, textarea {
+    width: 100%; background: rgba(255,255,255,.05); border: 1px solid var(--line); color: var(--txt);
+    border-radius: 10px; padding: 9px 12px; font-size: 13px; font-family: inherit; outline: none;
+  }
+  input:focus, textarea:focus { border-color: var(--pri); }
+  label { font-size: 11.5px; color: var(--sub); display: block; margin: 12px 0 6px; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .row > * { flex: 1; }
+  .row > .btn { flex: 0 0 auto; }
+  .search { max-width: 320px; }
+  .muted { color: var(--sub); font-size: 12px; }
+  .section-title { font-size: 15px; font-weight: 800; margin: 4px 0 14px; display: flex; align-items: center; gap: 8px; }
+  .section-title::before { content: ''; width: 4px; height: 15px; border-radius: 2px; background: linear-gradient(var(--pri), var(--pri2)); }
+  /* 登录 */
+  #login { max-width: 400px; margin: 8vh auto; }
+  #login h2 { font-size: 20px; margin-bottom: 4px; }
+  #login .sub { color: var(--sub); font-size: 12.5px; margin-bottom: 6px; }
+  #login .err { color: var(--red); font-size: 12px; margin-top: 10px; min-height: 16px; }
+  /* 抽屉 */
+  .drawer-mask { position: fixed; inset: 0; background: rgba(0,0,0,.55); display: none; z-index: 40; }
+  .drawer { position: fixed; top: 0; right: -460px; width: 430px; max-width: 92vw; height: 100vh; z-index: 50;
+    background: #121830; border-left: 1px solid var(--line); transition: right .28s cubic-bezier(.2,.9,.15,1);
+    padding: 22px; overflow-y: auto; }
+  .drawer.open { right: 0; }
+  .drawer-mask.open { display: block; }
+  .drawer h3 { font-size: 16px; margin-bottom: 2px; }
+  .kv { display: flex; justify-content: space-between; font-size: 12.5px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.05); }
+  .kv .k { color: var(--sub); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .toast { position: fixed; left: 50%; top: 26px; transform: translateX(-50%) translateY(-80px); z-index: 99;
+    background: #1a2242; border: 1px solid var(--line); padding: 10px 20px; border-radius: 12px; font-size: 13px;
+    transition: transform .3s cubic-bezier(.2,.9,.15,1); box-shadow: 0 10px 40px rgba(0,0,0,.5); }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .hide { display: none !important; }
+  /* 开关 */
+  .sw-row { display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+  .sw-row:last-of-type { border-bottom: 0; }
+  .sw { position: relative; display: inline-block; width: 46px; height: 26px; flex: 0 0 46px; cursor: pointer; }
+  .sw input { opacity: 0; width: 0; height: 0; }
+  .sw span { position: absolute; inset: 0; background: rgba(255,255,255,.14); border-radius: 99px; transition: .2s; }
+  .sw span::before { content: ''; position: absolute; width: 20px; height: 20px; left: 3px; top: 3px;
+    background: #fff; border-radius: 50%; transition: .2s; }
+  .sw input:checked + span { background: linear-gradient(135deg, var(--pri), var(--pri2)); }
+  .sw input:checked + span::before { transform: translateX(20px); }
+  /* 广告卡片 / 功能行 */
+  .ad-item { border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-bottom: 10px; background: rgba(255,255,255,.025); }
+  .ad-item .hd { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .ad-item .hd b { font-size: 13px; }
+  .ad-item .mini { display: grid; grid-template-columns: 1.1fr 1fr 2fr .7fr auto; gap: 8px; align-items: center; }
+  .ad-item .mini input, .ad-item .mini select { font-size: 12px; padding: 7px 9px; }
+  .ad-item .mini label { margin: 0; font-size: 10.5px; display: block; margin-bottom: 3px; }
+  select { width: 100%; background: rgba(255,255,255,.05); border: 1px solid var(--line); color: var(--txt);
+    border-radius: 10px; padding: 9px 12px; font-size: 13px; font-family: inherit; outline: none; }
+  .ft-group { margin-bottom: 18px; }
+  .ft-group h4 { font-size: 13px; margin-bottom: 8px; color: var(--pri); font-weight: 800; }
+  .ft-row { display: grid; grid-template-columns: 1.4fr 60px 68px 68px 1.6fr; gap: 10px; align-items: center;
+    padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.05); font-size: 12.5px; }
+  .ft-row .nm { font-weight: 600; }
+  .ft-row .key { font-size: 10.5px; color: var(--sub); font-family: ui-monospace, monospace; }
+  .ft-row .c { text-align: center; }
+  .ft-row input[type=text] { font-size: 11.5px; padding: 6px 9px; }
+  .ft-row input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--pri); cursor: pointer; }
+  .ft-head { display: grid; grid-template-columns: 1.4fr 60px 68px 68px 1.6fr; gap: 10px;
+    font-size: 11px; color: var(--sub); padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+  .ft-head .c { text-align: center; }
+  .plan-item { display: grid; grid-template-columns: 1fr 1.4fr .8fr 1.6fr .8fr auto auto; gap: 10px; align-items: end;
+    padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.05); }
+  .plan-item label { margin: 0 0 5px; font-size: 10.5px; }
+  .tab-scroll { max-height: calc(100vh - 200px); overflow-y: auto; padding-right: 4px; }
+  @media (max-width: 720px) { body { padding: 14px; } .stats { grid-template-columns: repeat(2, 1fr); } .drawer { width: 100vw; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">🫧</div>
+    <div>
+      <h1>智学 · 管理后台</h1>
+      <div class="muted" id="server-info"></div>
+    </div>
+    <div style="flex:1"></div>
+    <span class="tag">Admin Console</span>
+  </header>
+
+  <!-- 登录 -->
+  <div id="login" class="card">
+    <h2>管理员登录</h2>
+    <div class="sub">使用注册的智学账号登录；首个注册用户自动成为管理员。</div>
+    <label>服务器地址</label>
+    <input id="lg-base" value="">
+    <label>邮箱</label>
+    <input id="lg-email" type="email" placeholder="admin@example.com">
+    <label>密码</label>
+    <input id="lg-pwd" type="password" placeholder="••••••">
+    <div class="row" style="margin-top:16px">
+      <button class="btn pri" id="lg-btn" onclick="doLogin()">登 录</button>
+      <button class="btn" onclick="checkHealth()">测试连接</button>
+    </div>
+    <div class="err" id="lg-err"></div>
+    <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--line)">
+      <div class="muted" style="margin-bottom:8px">没有管理员账号？用服务器启动时设置的 ADMIN_KEY 直接进入：</div>
+      <div class="row">
+        <input id="lg-key" type="password" placeholder="ADMIN_KEY">
+        <button class="btn" onclick="doKeyLogin()">用密匙进入</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 主界面 -->
+  <div id="app" class="hide">
+    <div class="nav">
+      <button data-tab="dash" onclick="switchTab('dash')">📊 仪表盘</button>
+      <button data-tab="users" onclick="switchTab('users')">👥 用户管理</button>
+      <button data-tab="ads" onclick="switchTab('ads')">📢 广告位</button>
+      <button data-tab="pay" onclick="switchTab('pay')">💳 会员定价</button>
+      <button data-tab="features" onclick="switchTab('features')">🎛️ 功能开关</button>
+      <button data-tab="release" onclick="switchTab('release')">🚀 版本公告</button>
+      <button data-tab="broadcast" onclick="switchTab('broadcast')">📣 通知广播</button>
+      <button data-tab="notify" onclick="switchTab('notify')">🔔 通知记录</button>
+      <button data-tab="logs" onclick="switchTab('logs')">🛡️ 登录审计</button>
+      <div style="flex:1"></div>
+      <button onclick="logout()" style="color:var(--red)">退出登录</button>
+    </div>
+
+    <!-- 仪表盘 -->
+    <div id="tab-dash">
+      <div class="stats" id="stats"></div>
+      <div class="card">
+        <div class="section-title">最近登录</div>
+        <div id="dash-logs"></div>
+      </div>
+    </div>
+
+    <!-- 用户管理 -->
+    <div id="tab-users" class="hide">
+      <div class="card">
+        <div class="row" style="margin-bottom:14px">
+          <input class="search" id="u-q" placeholder="搜索 UID / 邮箱 / 昵称 / 短 ID" oninput="loadUsers()">
+          <button class="btn" onclick="loadUsers()">刷新</button>
+        </div>
+        <div style="overflow-x:auto">
+        <table>
+          <thead><tr>
+            <th>用户</th><th>UID</th><th>注册时间</th><th>最近登录</th>
+            <th>智能体</th><th>消息</th><th>状态</th><th style="width:230px">操作</th>
+          </tr></thead>
+          <tbody id="users-body"></tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 广告位 -->
+    <div id="tab-ads" class="hide">
+      <div class="grid2">
+        <div class="card">
+          <div class="section-title">广告总开关（App 免登录拉取，改完即时生效）</div>
+          <div class="sw-row"><div><b>全局广告总开关</b><div class="muted">关掉后 App 内所有广告位都不展示（开屏/横幅/信息流）</div></div>
+            <label class="sw"><input type="checkbox" id="g-adsEnabled" onchange="saveGlobal()"><span></span></label></div>
+          <div class="sw-row"><div><b>开屏广告</b><div class="muted">App 启动时展示的全屏广告</div></div>
+            <label class="sw"><input type="checkbox" id="g-splashAdEnabled" onchange="saveGlobal()"><span></span></label></div>
+          <div class="sw-row"><div><b>横幅广告</b><div class="muted">页面底部常驻横幅</div></div>
+            <label class="sw"><input type="checkbox" id="g-bannerAdEnabled" onchange="saveGlobal()"><span></span></label></div>
+          <div class="sw-row"><div><b>信息流广告</b><div class="muted">列表流中穿插的卡片</div></div>
+            <label class="sw"><input type="checkbox" id="g-feedAdEnabled" onchange="saveGlobal()"><span></span></label></div>
+          <label>会员定价说明文案（App 会员页顶部）</label>
+          <input id="g-vipPriceNote" maxlength="80" placeholder="会员只为去广告与加速付费，学习功能永久免费">
+          <div class="row" style="margin-top:14px"><button class="btn pri" onclick="saveGlobal()">保存总开关</button></div>
+        </div>
+        <div class="card">
+          <div class="section-title">当前下发情况</div>
+          <div class="muted" style="line-height:2;font-size:12.5px" id="ads-hint">—</div>
+          <div style="margin-top:14px">
+            <a class="btn" href="/ads/config" target="_blank" style="text-decoration:none;display:inline-block">查看 /ads/config 原始 JSON</a>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <div class="row" style="margin-bottom:12px">
+          <div class="section-title" style="margin:0">广告位列表</div>
+          <div style="flex:1"></div>
+          <button class="btn" onclick="addAd()">＋ 新增广告位</button>
+          <button class="btn" onclick="loadAds()">刷新</button>
+          <button class="btn pri" onclick="saveAds()">保存全部</button>
+        </div>
+        <div id="ads-list"></div>
+      </div>
+    </div>
+
+    <!-- 会员定价 -->
+    <div id="tab-pay" class="hide">
+      <div class="grid2">
+        <div class="card">
+          <div class="section-title">基础设置</div>
+          <div class="sw-row"><div><b>开启会员付费</b><div class="muted">关掉后 App 会员页显示「暂未开放」</div></div>
+            <label class="sw"><input type="checkbox" id="p-enabled"><span></span></label></div>
+          <label>联系邮箱（用户点「开通」时收到的收件方）</label>
+          <input id="p-contact" placeholder="1909159041@qq.com">
+          <label>联系方式提示</label>
+          <input id="p-contactTip" placeholder="邮箱联系开通 / 咨询会员">
+          <label>支付方式</label>
+          <input id="p-method" placeholder="微信 / 支付宝">
+          <label>支付链接（可选，填了会替代收款码）</label>
+          <input id="p-link" placeholder="https://...">
+          <label>底部说明</label>
+          <textarea id="p-note" rows="2" maxlength="200"></textarea>
+          <div class="row" style="margin-top:14px"><button class="btn pri" onclick="savePay()">保存基础设置</button></div>
+        </div>
+        <div class="card">
+          <div class="section-title">收款码</div>
+          <div id="p-qr-box" style="text-align:center;padding:14px;border:1px dashed var(--line);border-radius:14px">
+            <img id="p-qr-img" style="max-width:200px;border-radius:10px;display:none">
+            <div class="muted" id="p-qr-none">还没有上传收款码</div>
+          </div>
+          <label>上传新收款码（png / jpg，≤4MB）</label>
+          <input type="file" accept="image/png,image/jpeg" id="p-qr-file" onchange="uploadQr(this)">
+          <label>收款码说明</label>
+          <input id="p-qrcodeNote" placeholder="扫码付款后，在 App 内填付款账号…">
+          <div class="row" style="margin-top:14px"><button class="btn pri" onclick="savePay()">保存说明</button></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <div class="row" style="margin-bottom:12px">
+          <div class="section-title" style="margin:0">会员套餐</div>
+          <div style="flex:1"></div>
+          <button class="btn" onclick="addPlan()">＋ 新增套餐</button>
+          <button class="btn pri" onclick="savePay()">保存全部</button>
+        </div>
+        <div id="plans-list"></div>
+        <div class="muted" style="margin-top:10px">「热门」套餐在 App 里会带角标；月数为 0 表示永久。</div>
+      </div>
+    </div>
+
+    <!-- 功能开关 -->
+    <div id="tab-features" class="hide">
+      <div class="card">
+        <div class="row" style="margin-bottom:12px">
+          <div class="section-title" style="margin:0">功能权限总表</div>
+          <div style="flex:1"></div>
+          <span class="muted" id="ft-count"></span>
+          <button class="btn" onclick="loadFeatures()">刷新</button>
+          <button class="btn pri" onclick="saveFeatures()">保存全部</button>
+        </div>
+        <div class="muted" style="line-height:1.9;margin-bottom:14px">
+          每行 4 个开关：<b>展示</b>=关掉后 App 里该功能消失；<b>需登录</b>=未登录点进去提示登录；<b>需会员</b>=非会员显示解锁提示；<b>提示语</b>=关闭时展示的文案。改完保存即可，App 下次启动或下拉刷新后生效，不用发版。
+        </div>
+        <div id="features-list"></div>
+      </div>
+    </div>
+
+    <!-- 版本公告 -->
+    <div id="tab-release" class="tab-scroll">
+      <div class="grid2">
+        <div class="card">
+          <div class="section-title">App 版本（OTA）</div>
+          <div class="muted" style="margin-bottom:12px">改这里之后，App 启动会自动提示更新。APK 放进服务器 <code>releases/</code> 目录。</div>
+          <label>当前版本号</label><input id="v-version" placeholder="V28">
+          <label>版本码（必须递增，整数）</label><input id="v-code" type="number" placeholder="28">
+          <label>APK 路径</label><input id="v-apk" placeholder="/releases/zhixue-client-v28.apk">
+          <label>最低兼容版本码</label><input id="v-minCode" type="number" placeholder="12">
+          <div class="sw-row" style="margin-top:14px"><div><b>强制更新</b><div class="muted">开启后旧版本必须更新才能继续用</div></div>
+            <label class="sw"><input type="checkbox" id="v-force"><span></span></label></div>
+          <label>更新说明</label><textarea id="v-notes" rows="3" maxlength="300"></textarea>
+          <div class="row" style="margin-top:14px">
+            <button class="btn pri" onclick="saveVersion()">保存版本</button>
+            <a class="btn" href="/app/latest" target="_blank" style="text-decoration:none;display:inline-block">查看 /app/latest</a>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-title">全站公告</div>
+          <div class="muted" style="margin-bottom:12px">公告会显示在 App 首页顶部（可关闭），过期自动消失。</div>
+          <label>公告内容（留空 = 不显示）</label>
+          <textarea id="g-announcement" rows="4" maxlength="300" placeholder="例如：国庆期间会员 8 折，活动截止 10 月 8 日"></textarea>
+          <label>截止时间（留空 = 长期有效）</label>
+          <input id="g-announcementUntil" type="datetime-local">
+          <div class="row" style="margin-top:14px"><button class="btn pri" onclick="saveGlobal(true)">保存公告</button></div>
+          <div class="section-title" style="margin-top:22px">格式说明</div>
+          <div class="muted" style="line-height:1.9;font-size:12.5px">
+            公告存于 <code>features.json</code> 的 <code>global.announcement</code>，截止时间存 <code>announcementUntil</code>（ISO 时间）。<br>
+            版本信息存于 <code>version.json</code>，只改数字和文案，别动 JSON 结构。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 广播 -->
+    <div id="tab-broadcast" class="hide">
+      <div class="grid2">
+        <div class="card">
+          <div class="section-title">全员广播</div>
+          <label>标题</label>
+          <input id="bc-title" maxlength="60" placeholder="例如：智学 v2.0 更新公告">
+          <label>内容</label>
+          <textarea id="bc-body" rows="5" maxlength="500" placeholder="全员可见，会出现在每个用户 App 的通知中心…"></textarea>
+          <div class="row" style="margin-top:16px">
+            <button class="btn pri" onclick="broadcast()">发送广播</button>
+            <span class="muted">将推送给全部 App 用户</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-title">使用说明</div>
+          <div class="muted" style="line-height:2; font-size:12.5px">
+            · 广播下发后，用户打开「通知中心」即可看到；<br>
+            · 单个用户的通知在「用户管理 → 发通知」里单独发送；<br>
+            · 禁用用户会立即吊销其全部登录会话；<br>
+            · 管理员账号不能被禁用，防止误锁死；<br>
+            · 登录审计保留最近 500 条记录。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 通知记录 -->
+    <div id="tab-notify" class="hide">
+      <div class="card">
+        <div class="section-title">已下发通知</div>
+        <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>标题</th><th>内容</th><th>范围</th><th>发送者</th><th>时间</th><th>已读</th><th></th></tr></thead>
+          <tbody id="notify-body"></tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 登录审计 -->
+    <div id="tab-logs" class="hide">
+      <div class="card">
+        <div class="section-title">登录审计（最近 100 条）</div>
+        <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>时间</th><th>邮箱</th><th>结果</th><th>IP</th><th>设备</th></tr></thead>
+          <tbody id="logs-body"></tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 用户详情抽屉 -->
+<div class="drawer-mask" id="mask" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="row" style="margin-bottom:14px">
+    <h3 id="dr-name">用户详情</h3>
+    <div style="flex:1"></div>
+    <button class="btn" onclick="closeDrawer()">✕</button>
+  </div>
+  <div id="dr-body"></div>
+  <div style="margin-top:18px">
+    <div class="section-title">给该用户发通知</div>
+    <label>标题</label>
+    <input id="dr-n-title" maxlength="60" placeholder="通知标题">
+    <label>内容</label>
+    <textarea id="dr-n-body" rows="4" maxlength="500" placeholder="通知内容…"></textarea>
+    <div class="row" style="margin-top:12px">
+      <button class="btn pri" onclick="sendUserNotify()">发送</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let BASE = localStorage.getItem('lx_base') || location.origin;
+let TOKEN = localStorage.getItem('lx_token') || '';
+let AKEY = localStorage.getItem('lx_akey') || '';
+let CURRENT = null;
+
+const $ = id => document.getElementById(id);
+const fmt = t => t ? new Date(t).toLocaleString('zh-CN', {hour12:false}) : '—';
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 2200); }
+
+async function api(path, opts = {}) {
+  const r = await fetch(BASE + path, {
+    method: opts.method || 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(TOKEN ? { Authorization: 'Bearer ' + TOKEN } : {}),
+      ...(AKEY ? { 'X-Admin-Key': AKEY } : {}),
+    },
+    body: opts.body ? JSON.stringify(opts.body) : undefined,
+  });
+  const j = await r.json().catch(() => ({ code: -1, message: '响应不是 JSON' }));
+  if (j.code !== 0) throw new Error(j.message || ('HTTP ' + r.status));
+  return j.data;
+}
+
+/** 用 ADMIN_KEY 直接进入（不需要管理员账号） */
+async function doKeyLogin() {
+  $('lg-err').style.color = 'var(--red)';
+  BASE = $('lg-base').value.trim().replace(/\/+$/, '') || location.origin;
+  const key = $('lg-key').value.trim();
+  if (!key) { $('lg-err').textContent = '请输入 ADMIN_KEY'; return; }
+  localStorage.setItem('lx_base', BASE);
+  const old = AKEY; AKEY = key; TOKEN = '';
+  try {
+    await api('/admin/stats');           // 用 stats 验一下密匙对不对
+    localStorage.setItem('lx_akey', key);
+    localStorage.removeItem('lx_token');
+    enterApp();
+  } catch (e) {
+    AKEY = old;
+    $('lg-err').textContent = '密匙无效：' + e.message;
+  }
+}
+
+function checkHealth() {
+  BASE = $('lg-base').value.trim().replace(/\/+$/, '') || location.origin;
+  localStorage.setItem('lx_base', BASE);
+  fetch(BASE + '/api/health').then(r => r.json()).then(j => {
+    $('lg-err').style.color = 'var(--green)';
+    $('lg-err').textContent = '连接成功：' + JSON.stringify(j.data || j);
+  }).catch(e => { $('lg-err').style.color = 'var(--red)'; $('lg-err').textContent = '连接失败：' + e.message; });
+}
+
+async function doLogin() {
+  $('lg-err').style.color = 'var(--red)';
+  BASE = $('lg-base').value.trim().replace(/\/+$/, '') || location.origin;
+  const email = $('lg-email').value.trim(), pwd = $('lg-pwd').value;
+  if (!email || !pwd) { $('lg-err').textContent = '请输入邮箱和密码'; return; }
+  localStorage.setItem('lx_base', BASE);
+  $('lg-btn').disabled = true; $('lg-btn').textContent = '登录中…';
+  try {
+    const d = await api('/auth/login', { method: 'POST', body: { email, password: pwd } });
+    TOKEN = d.token; localStorage.setItem('lx_token', TOKEN);
+    if (!d.isAdmin) { TOKEN = ''; localStorage.removeItem('lx_token'); $('lg-err').textContent = '该账号不是管理员'; return; }
+    enterApp();
+  } catch (e) { $('lg-err').textContent = e.message; }
+  finally { $('lg-btn').disabled = false; $('lg-btn').textContent = '登 录'; }
+}
+
+function logout() {
+  TOKEN = ''; AKEY = '';
+  localStorage.removeItem('lx_token'); localStorage.removeItem('lx_akey');
+  $('app').classList.add('hide'); $('login').classList.remove('hide');
+}
+
+function enterApp() {
+  $('login').classList.add('hide'); $('app').classList.remove('hide');
+  $('server-info').textContent = BASE;
+  switchTab('dash');
+}
+
+function switchTab(t) {
+  document.querySelectorAll('.nav button[data-tab]').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
+  ['dash','users','ads','pay','features','release','broadcast','notify','logs'].forEach(x => $('tab-' + x).classList.toggle('hide', x !== t));
+  if (t === 'dash') loadDash();
+  if (t === 'users') loadUsers();
+  if (t === 'ads') loadAds();
+  if (t === 'pay') loadPay();
+  if (t === 'features') loadFeatures();
+  if (t === 'release') loadRelease();
+  if (t === 'notify') loadNotify();
+  if (t === 'logs') loadLogs();
+}
+
+/* ---------- 仪表盘 ---------- */
+async function loadDash() {
+  try {
+    const s = await api('/admin/stats');
+    $('stats').innerHTML = [
+      ['注册用户', s.users, '24h 新增 ' + s.newUsers24h],
+      ['在线会话', s.online, '当前有效 Token'],
+      ['累计消息', s.messages, '含 AI / 好友'],
+      ['好友关系', s.friends, '已接受'],
+      ['AI 智能体', s.agents, '含预置学习助手'],
+      ['登录成功 24h', s.logins24h, '失败 ' + s.loginFails24h],
+      ['禁用账号', s.banned, '管理员 ' + s.admins + ' 名'],
+      ['单词 / 课程', s.words + ' / ' + s.courses, '学习数据'],
+    ].map(([k, v, d]) => `<div class="card stat"><div class="k">${k}</div><div class="v">${v}</div><div class="d">${d}</div></div>`).join('');
+    const logs = await api('/admin/login-logs?limit=8');
+    $('dash-logs').innerHTML = `<table><thead><tr><th>时间</th><th>邮箱</th><th>结果</th><th>IP</th></tr></thead><tbody>` +
+      logs.map(l => `<tr><td>${fmt(l.createdAt)}</td><td>${esc(l.email)}</td>
+        <td><span class="pill ${l.ok ? 'ok' : 'ban'}">${l.ok ? '成功' : '失败'}</span></td>
+        <td class="muted">${esc(l.ip)}</td></tr>`).join('') + '</tbody></table>';
+  } catch (e) { toast(e.message); }
+}
+
+/* ---------- 用户 ---------- */
+async function loadUsers() {
+  try {
+    const q = encodeURIComponent($('u-q').value.trim());
+    const list = await api('/admin/users' + (q ? '?q=' + q : ''));
+    $('users-body').innerHTML = list.map(u => `
+      <tr>
+        <td><b>${esc(u.nickname)}</b><br><span class="muted">${esc(u.email)}</span></td>
+        <td class="muted">${esc(u.uid)}${u.shortId ? '<br>@' + esc(u.shortId) : ''}</td>
+        <td class="muted">${fmt(u.createdAt)}</td>
+        <td class="muted">${fmt(u.lastLoginAt)}</td>
+        <td>${u.agents}</td><td>${u.messages}</td>
+        <td>${u.admin ? '<span class="pill adm">管理员</span> ' : ''}${u.banned ? '<span class="pill ban">已禁用</span>' : '<span class="pill ok">正常</span>'}</td>
+        <td>
+          <button class="btn" onclick="openUser('${u.id}')">详情</button>
+          ${u.banned
+            ? `<button class="btn" onclick="banUser('${u.id}',false)">解禁</button>`
+            : `<button class="btn red" onclick="banUser('${u.id}',true)">禁用</button>`}
+        </td>
+      </tr>`).join('') || '<tr><td colspan="8" class="muted" style="padding:26px;text-align:center">没有匹配的用户</td></tr>';
+  } catch (e) { toast(e.message); }
+}
+
+async function banUser(id, banned) {
+  if (banned && !confirm('确定禁用该用户？其所有设备的登录状态会立即失效。')) return;
+  try { await api('/admin/users/' + id + '/ban', { method: 'POST', body: { banned } }); toast(banned ? '已禁用' : '已解禁'); loadUsers(); }
+  catch (e) { toast(e.message); }
+}
+
+async function openUser(id) {
+  try {
+    const d = await api('/admin/users/' + id);
+    CURRENT = d.user; CURRENT.admin = d.admin;
+    $('dr-name').textContent = d.user.nickname + '（' + d.user.email + '）';
+    $('dr-body').innerHTML = `
+      <div class="kv"><span class="k">UID</span><span>${esc(d.user.uid)}</span></div>
+      <div class="kv"><span class="k">短 ID</span><span>${esc(d.user.shortId) || '—'}</span></div>
+      <div class="kv"><span class="k">性别 / 取向</span><span>${esc(d.user.gender)} / ${esc(d.user.orientation)}</span></div>
+      <div class="kv"><span class="k">简介</span><span>${esc(d.user.bio) || '—'}</span></div>
+      <div class="kv"><span class="k">注册时间</span><span>${fmt(d.user.createdAt)}</span></div>
+      <div class="kv"><span class="k">最近登录</span><span>${fmt(d.user.lastLoginAt)}</span></div>
+      <div class="kv"><span class="k">会话数</span><span>${d.stats.chats}</span></div>
+      <div class="kv"><span class="k">消息数</span><span>${d.stats.messages}</span></div>
+      <div class="kv"><span class="k">AI 智能体</span><span>${d.stats.agents}</span></div>
+      <div class="kv"><span class="k">好友数</span><span>${d.stats.friends}</span></div>
+      <div class="kv"><span class="k">单词 / 课程</span><span>${d.stats.words} / ${d.stats.courses}</span></div>
+      <div class="kv"><span class="k">状态</span><span>${d.user.banned ? '<span class="pill ban">已禁用</span>' : '<span class="pill ok">正常</span>'}</span></div>
+      <div class="row" style="margin-top:14px">
+        <button class="btn ${d.admin ? 'red' : 'pri'}" onclick="toggleAdmin('${d.user.id}', ${!d.admin})">${d.admin ? '撤销管理员' : '任命为管理员'}</button>
+        ${d.user.banned ? `<button class="btn" onclick="banUser('${d.user.id}',false);openUser('${d.user.id}')">解禁</button>`
+                       : `<button class="btn red" onclick="banUser('${d.user.id}',true);openUser('${d.user.id}')">禁用</button>`}
+      </div>`;
+    $('drawer').classList.add('open'); $('mask').classList.add('open');
+  } catch (e) { toast(e.message); }
+}
+
+async function toggleAdmin(id, make) {
+  try { await api('/admin/users/' + id + '/admin', { method: 'POST', body: { admin: make } }); toast(make ? '已任命为管理员' : '已撤销管理员'); loadUsers(); openUser(id); }
+  catch (e) { toast(e.message); }
+}
+
+async function sendUserNotify() {
+  if (!CURRENT) return;
+  const title = $('dr-n-title').value.trim(), body = $('dr-n-body').value.trim();
+  if (!title || !body) { toast('标题和内容不能为空'); return; }
+  try { await api('/admin/users/' + CURRENT.id + '/notify', { method: 'POST', body: { title, body } }); toast('已发送给 ' + CURRENT.nickname); $('dr-n-title').value = ''; $('dr-n-body').value = ''; }
+  catch (e) { toast(e.message); }
+}
+
+/* ---------- 广播 ---------- */
+async function broadcast() {
+  const title = $('bc-title').value.trim(), body = $('bc-body').value.trim();
+  if (!title || !body) { toast('标题和内容不能为空'); return; }
+  if (!confirm('将发送给全部用户，确定？')) return;
+  try { await api('/admin/broadcast', { method: 'POST', body: { title, body } }); toast('广播已发送'); $('bc-title').value = ''; $('bc-body').value = ''; }
+  catch (e) { toast(e.message); }
+}
+
+/* ---------- 通知记录 ---------- */
+async function loadNotify() {
+  try {
+    const list = await api('/admin/notifications');
+    $('notify-body').innerHTML = list.map(n => `
+      <tr>
+        <td><b>${esc(n.title)}</b></td>
+        <td class="muted" style="max-width:280px">${esc(n.body).slice(0, 80)}</td>
+        <td>${n.userId === null ? '<span class="pill adm">全员</span>' : '<span class="pill ok">单人</span>'}</td>
+        <td class="muted">${esc(n.sender)}</td>
+        <td class="muted">${fmt(n.createdAt)}</td>
+        <td>${n.userId === null ? (n.readBy || []).length + ' 人已读' : ((n.readBy || []).length ? '已读' : '未读')}</td>
+        <td><button class="btn red" onclick="delNotify('${n.id}')">删除</button></td>
+      </tr>`).join('') || '<tr><td colspan="7" class="muted" style="padding:26px;text-align:center">还没有下发过通知</td></tr>';
+  } catch (e) { toast(e.message); }
+}
+
+async function delNotify(id) {
+  try { await api('/admin/notifications/' + id, { method: 'DELETE' }); toast('已删除'); loadNotify(); }
+  catch (e) { toast(e.message); }
+}
+
+/* ---------- 审计 ---------- */
+async function loadLogs() {
+  try {
+    const logs = await api('/admin/login-logs?limit=100');
+    $('logs-body').innerHTML = logs.map(l => `
+      <tr>
+        <td class="muted">${fmt(l.createdAt)}</td>
+        <td>${esc(l.email)}</td>
+        <td><span class="pill ${l.ok ? 'ok' : 'ban'}">${l.ok ? '成功' : '失败'}</span></td>
+        <td class="muted">${esc(l.ip)}</td>
+        <td class="muted">${esc(l.ua).slice(0, 46)}</td>
+      </tr>`).join('') || '<tr><td colspan="5" class="muted" style="padding:26px;text-align:center">暂无记录</td></tr>';
+  } catch (e) { toast(e.message); }
+}
+
+function closeDrawer() { $('drawer').classList.remove('open'); $('mask').classList.remove('open'); CURRENT = null; }
+
+/* ==================== 广告位 ==================== */
+let ADS = [], ADG = {};
+const AD_TYPES = [['splash','开屏'],['banner','横幅'],['feed','信息流'],['card','卡片']];
+
+async function loadAds() {
+  try {
+    const cfg = await api('/ads/config');
+    ADS = cfg.ads || [];
+    const fc = await api('/features/config');
+    ADG = fc.global || {};
+    ['adsEnabled','splashAdEnabled','bannerAdEnabled','feedAdEnabled'].forEach(k => { const el = $('g-' + k); if (el) el.checked = ADG[k] !== false; });
+    $('g-vipPriceNote').value = ADG.vipPriceNote || '';
+    const on = ADS.filter(a => a.enabled !== false).length;
+    $('ads-hint').innerHTML = `共 <b>${ADS.length}</b> 个广告位，其中 <b>${on}</b> 个已启用。<br>
+      总开关：<b style="color:${ADG.adsEnabled === false ? 'var(--red)' : 'var(--green)'}">${ADG.adsEnabled === false ? '已关闭' : '开启中'}</b><br>
+      更新时间：${esc(cfg.updatedAt || '—')}<br>
+      <span style="color:var(--amber)">提示：会员用户会自动跳过全部广告，这是 App 端逻辑，不用在这里配。</span>`;
+    renderAds();
+  } catch (e) { toast(e.message); }
+}
+
+function renderAds() {
+  $('ads-list').innerHTML = ADS.map((a, i) => `
+    <div class="ad-item">
+      <div class="hd">
+        <b>#${i + 1} ${esc(a.title || '(未命名)')}</b>
+        <span class="pill ${a.enabled !== false ? 'ok' : 'ban'}">${a.enabled !== false ? '启用' : '关闭'}</span>
+        <div style="flex:1"></div>
+        <label class="sw"><input type="checkbox" ${a.enabled !== false ? 'checked' : ''} onchange="ADS[${i}].enabled=this.checked"><span></span></label>
+        <button class="btn red" onclick="delAd(${i})">删除</button>
+      </div>
+      <div class="mini">
+        <div><label>广告位 ID</label><input value="${esc(a.id || '')}" oninput="ADS[${i}].id=this.value"></div>
+        <div><label>类型</label><select onchange="ADS[${i}].type=this.value">
+          ${AD_TYPES.map(([v, n]) => `<option value="${v}" ${a.type === v ? 'selected' : ''}>${n}</option>`).join('')}
+        </select></div>
+        <div><label>标题</label><input value="${esc(a.title || '')}" oninput="ADS[${i}].title=this.value"></div>
+        <div><label>权重</label><input type="number" value="${a.weight ?? 100}" oninput="ADS[${i}].weight=+this.value"></div>
+        <div><button class="btn" onclick="ADS[${i}]._open=!ADS[${i}]._open;renderAds()">更多</button></div>
+      </div>
+      <div class="mini" style="margin-top:8px;grid-template-columns:2fr 2fr 2fr">
+        <div><label>副标题 / 描述</label><input value="${esc(a.desc || '')}" oninput="ADS[${i}].desc=this.value"></div>
+        <div><label>跳转（https:// 或 zhixue://vip）</label><input value="${esc(a.actionUrl || '')}" oninput="ADS[${i}].actionUrl=this.value"></div>
+        <div><label>图片地址（留空则纯文字广告）</label><input value="${esc(a.image || '')}" oninput="ADS[${i}].image=this.value"></div>
+      </div>
+    </div>`).join('') || '<div class="muted" style="padding:26px;text-align:center">还没有广告位，点右上角「＋ 新增广告位」</div>';
+}
+
+function addAd() {
+  ADS.push({ id: 'ad_' + Date.now().toString(36), type: 'banner', title: '新广告位', desc: '', image: '', actionUrl: 'zhixue://vip', weight: 100, enabled: true });
+  renderAds();
+}
+function delAd(i) { if (confirm('确定删除这个广告位？')) { ADS.splice(i, 1); renderAds(); } }
+
+async function saveAds() {
+  try {
+    const clean = ADS.map(a => { const o = {}; for (const k of ['id','type','title','desc','image','actionUrl','weight','enabled']) o[k] = a[k]; return o; });
+    const r = await api('/admin/ads', { method: 'POST', body: { ads: clean } });
+    toast('已保存 ' + r.count + ' 个广告位');
+    loadAds();
+  } catch (e) { toast(e.message); }
+}
+
+async function saveGlobal(fromAnnounce) {
+  try {
+    const g = Object.assign({}, ADG);
+    ['adsEnabled','splashAdEnabled','bannerAdEnabled','feedAdEnabled'].forEach(k => { const el = $('g-' + k); if (el) g[k] = el.checked; });
+    if ($('g-vipPriceNote')) g.vipPriceNote = $('g-vipPriceNote').value;
+    if (fromAnnounce === true || $('g-announcement')) {
+      g.announcement = $('g-announcement').value;
+      const until = $('g-announcementUntil').value;
+      g.announcementUntil = until ? new Date(until).toISOString() : '';
+    }
+    ADG = g;
+    const fc = await api('/features/config');
+    await api('/admin/features', { method: 'POST', body: { groups: fc.groups, global: g } });
+    toast('已保存，App 下次启动生效');
+  } catch (e) { toast(e.message); }
+}
+
+/* ==================== 会员定价 ==================== */
+let PAY = { plans: [] };
+
+async function loadPay() {
+  try {
+    PAY = await api('/pay/config');
+    PAY.plans = PAY.plans || [];
+    $('p-enabled').checked = PAY.enabled !== false;
+    $('p-contact').value = PAY.contact || '';
+    $('p-contactTip').value = PAY.contactTip || '';
+    $('p-method').value = PAY.method || '';
+    $('p-link').value = PAY.link || '';
+    $('p-note').value = PAY.note || '';
+    $('p-qrcodeNote').value = PAY.qrcodeNote || '';
+    const img = $('p-qr-img');
+    if (PAY.qrcode) {
+      img.src = BASE + PAY.qrcode + '?t=' + Date.now();
+      img.style.display = 'inline-block';
+      $('p-qr-none').style.display = 'none';
+    } else {
+      img.style.display = 'none';
+      $('p-qr-none').style.display = 'block';
+    }
+    renderPlans();
+  } catch (e) { toast(e.message); }
+}
+
+function renderPlans() {
+  $('plans-list').innerHTML = PAY.plans.map((p, i) => `
+    <div class="plan-item">
+      <div><label>套餐 ID</label><input value="${esc(p.id || '')}" oninput="PAY.plans[${i}].id=this.value"></div>
+      <div><label>名称</label><input value="${esc(p.name || '')}" oninput="PAY.plans[${i}].name=this.value"></div>
+      <div><label>价格 ¥</label><input value="${esc(p.price || '')}" oninput="PAY.plans[${i}].price=this.value"></div>
+      <div><label>描述</label><input value="${esc(p.desc || '')}" oninput="PAY.plans[${i}].desc=this.value"></div>
+      <div><label>月数(0=永久)</label><input type="number" value="${p.months ?? 1}" oninput="PAY.plans[${i}].months=+this.value"></div>
+      <div><label>热门</label><label class="sw" style="display:inline-block;width:40px;height:22px;flex:none">
+        <input type="checkbox" ${p.hot ? 'checked' : ''} onchange="PAY.plans[${i}].hot=this.checked"><span style="border-radius:99px"></span></label></div>
+      <div><button class="btn red" onclick="delPlan(${i})">删</button></div>
+    </div>`).join('') || '<div class="muted" style="padding:20px;text-align:center">还没有套餐</div>';
+}
+
+function addPlan() {
+  PAY.plans.push({ id: 'plan_' + Date.now().toString(36), name: '新套餐', price: '9.9', desc: '', months: 1, hot: false });
+  renderPlans();
+}
+function delPlan(i) { if (confirm('删除该套餐？')) { PAY.plans.splice(i, 1); renderPlans(); } }
+
+async function savePay() {
+  try {
+    const body = {
+      enabled: $('p-enabled').checked,
+      contact: $('p-contact').value,
+      contactTip: $('p-contactTip').value,
+      method: $('p-method').value,
+      link: $('p-link').value,
+      note: $('p-note').value,
+      qrcodeNote: $('p-qrcodeNote').value,
+      plans: PAY.plans.map(p => ({ id: p.id, name: p.name, price: p.price, desc: p.desc, months: p.months, hot: !!p.hot })),
+    };
+    await api('/admin/pay', { method: 'POST', body });
+    toast('已保存，App 会员页立即生效');
+    loadPay();
+  } catch (e) { toast(e.message); }
+}
+
+function uploadQr(input) {
+  const f = input.files && input.files[0];
+  if (!f) return;
+  if (f.size > 4 * 1024 * 1024) { toast('图片超过 4MB'); return; }
+  const r = new FileReader();
+  r.onload = async () => {
+    try {
+      const ext = /\.jpe?g$/i.test(f.name) ? 'jpg' : 'png';
+      const d = await api('/admin/pay/qrcode', { method: 'POST', body: { data: r.result, ext } });
+      toast('收款码已上传');
+      const img = $('p-qr-img');
+      img.src = BASE + d.qrcode + '?t=' + Date.now();
+      img.style.display = 'inline-block';
+      $('p-qr-none').style.display = 'none';
+    } catch (e) { toast(e.message); }
+  };
+  r.readAsDataURL(f);
+}
+
+/* ==================== 功能开关 ==================== */
+let FG = [];
+
+async function loadFeatures() {
+  try {
+    const fc = await api('/features/config');
+    FG = fc.groups || [];
+    if (fc.global) {
+      ADG = fc.global;
+      ['adsEnabled','splashAdEnabled','bannerAdEnabled','feedAdEnabled'].forEach(k => { const el = $('g-' + k); if (el) el.checked = ADG[k] !== false; });
+      if ($('g-vipPriceNote')) $('g-vipPriceNote').value = ADG.vipPriceNote || '';
+      if ($('g-announcement')) $('g-announcement').value = ADG.announcement || '';
+      if ($('g-announcementUntil') && ADG.announcementUntil) {
+        const d = new Date(ADG.announcementUntil);
+        if (!isNaN(d)) {
+          const pad = n => String(n).padStart(2, '0');
+          $('g-announcementUntil').value = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
+      }
+    }
+    let total = 0;
+    $('features-list').innerHTML = FG.map((g, gi) => {
+      const items = g.items || [];
+      total += items.length;
+      return `<div class="ft-group">
+        <h4>${esc(g.name || g.key)} <span class="muted" style="font-weight:400;font-size:11px">(${items.length} 项)</span></h4>
+        <div class="ft-head"><div>功能</div><div class="c">展示</div><div class="c">需登录</div><div class="c">需会员</div><div>关闭时提示语</div></div>
+        ${items.map((it, ii) => `<div class="ft-row">
+          <div><div class="nm">${esc(it.name || it.key)}</div><div class="key">${esc(it.key)}</div></div>
+          <div class="c"><input type="checkbox" ${it.enabled !== false ? 'checked' : ''} onchange="FG[${gi}].items[${ii}].enabled=this.checked"></div>
+          <div class="c"><input type="checkbox" ${it.needLogin === true ? 'checked' : ''} onchange="FG[${gi}].items[${ii}].needLogin=this.checked"></div>
+          <div class="c"><input type="checkbox" ${it.needVip === true ? 'checked' : ''} onchange="FG[${gi}].items[${ii}].needVip=this.checked"></div>
+          <div><input type="text" value="${esc(it.tip || '')}" placeholder="（可选）" oninput="FG[${gi}].items[${ii}].tip=this.value"></div>
+        </div>`).join('')}
+      </div>`;
+    }).join('');
+    $('ft-count').textContent = `共 ${total} 项功能`;
+  } catch (e) { toast(e.message); }
+}
+
+async function saveFeatures() {
+  try {
+    const r = await api('/admin/features', { method: 'POST', body: { groups: FG, global: ADG } });
+    toast('已保存 ' + r.count + ' 项功能，App 下次启动生效');
+    loadFeatures();
+  } catch (e) { toast(e.message); }
+}
+
+/* ==================== 版本公告 ==================== */
+async function loadRelease() {
+  try {
+    const v = await api('/app/latest');
+    $('v-version').value = v.version || '';
+    $('v-code').value = v.code || '';
+    $('v-apk').value = (v.apk || '').replace(/^https?:\/\/[^/]+/, '');
+    $('v-minCode').value = v.minCode || '';
+    $('v-force').checked = !!v.force;
+    $('v-notes').value = v.notes || '';
+    const fc = await api('/features/config');
+    const g = fc.global || {};
+    $('g-announcement').value = g.announcement || '';
+    if (g.announcementUntil) {
+      const d = new Date(g.announcementUntil);
+      if (!isNaN(d)) {
+        const pad = n => String(n).padStart(2, '0');
+        $('g-announcementUntil').value = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      }
+    }
+    ADG = g;
+  } catch (e) { toast(e.message); }
+}
+
+async function saveVersion() {
+  try {
+    const body = {
+      version: $('v-version').value.trim(),
+      code: +$('v-code').value,
+      apk: $('v-apk').value.trim(),
+      minCode: +$('v-minCode').value || 12,
+      force: $('v-force').checked,
+      notes: $('v-notes').value,
+    };
+    if (!body.version || !body.code) { toast('版本号和版本码必填'); return; }
+    const r = await api('/admin/version', { method: 'POST', body });
+    toast('版本已更新到 ' + r.version + '（code ' + r.code + '）');
+    loadRelease();
+  } catch (e) { toast(e.message); }
+}
+
+/* ---------- 启动 ---------- */
+$('lg-base').value = BASE;
+if (TOKEN || AKEY) enterApp();
+</script>
+</body>
+</html>

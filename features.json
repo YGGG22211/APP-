@@ -1,0 +1,287 @@
+{
+  "updatedAt": "2026-10-27T07:01:07.092Z",
+  "note": "功能权限总表：改这里即可远程控制 App 各功能可见性/是否需登录/是否需会员，改完 App 下次启动或下拉刷新即生效，不用发版。",
+  "groups": [
+    {
+      "key": "learn",
+      "name": "学习",
+      "items": [
+        {
+          "key": "checkin",
+          "name": "签到",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        },
+        {
+          "key": "leaderboard",
+          "name": "排行榜",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        },
+        {
+          "key": "search_question",
+          "name": "搜题",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        },
+        {
+          "key": "wordbank",
+          "name": "单词本",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        },
+        {
+          "key": "wrongbook",
+          "name": "错题本",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        },
+        {
+          "key": "discussion",
+          "name": "学习讨论区",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        },
+        {
+          "key": "video",
+          "name": "课程视频",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        }
+      ]
+    },
+    {
+      "key": "social",
+      "name": "聊天与圈子",
+      "items": [
+        {
+          "key": "chat_ai",
+          "name": "AI 对话",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        },
+        {
+          "key": "friends",
+          "name": "加好友",
+          "enabled": true,
+          "needLogin": true,
+          "needVip": false,
+          "tip": "连接服务器后可用"
+        },
+        {
+          "key": "groups",
+          "name": "圈子 / 群组",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        },
+        {
+          "key": "moments",
+          "name": "朋友圈",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        },
+        {
+          "key": "discover",
+          "name": "发现好友",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        }
+      ]
+    },
+    {
+      "key": "tools",
+      "name": "工具",
+      "items": [
+        {
+          "key": "countdown",
+          "name": "倒数日",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        },
+        {
+          "key": "habit",
+          "name": "习惯打卡",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        },
+        {
+          "key": "gpa",
+          "name": "绩点计算",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        },
+        {
+          "key": "convert",
+          "name": "单位换算",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        },
+        {
+          "key": "random",
+          "name": "随机抽签",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        },
+        {
+          "key": "photo_solve",
+          "name": "拍照搜题",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        }
+      ]
+    },
+    {
+      "key": "me",
+      "name": "我的（广告下方条目同样可控）",
+      "items": [
+        {
+          "key": "vip",
+          "name": "会员开通",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        },
+        {
+          "key": "my_qr",
+          "name": "我的二维码",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        },
+        {
+          "key": "favorites",
+          "name": "我的收藏",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        },
+        {
+          "key": "ai_config",
+          "name": "AI 配置",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        },
+        {
+          "key": "voice",
+          "name": "语音设置",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        },
+        {
+          "key": "bind_server",
+          "name": "绑定服务器",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        },
+        {
+          "key": "server_settings",
+          "name": "服务器节点",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        },
+        {
+          "key": "glass",
+          "name": "玻璃参数",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        },
+        {
+          "key": "tutorial",
+          "name": "使用教程",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        },
+        {
+          "key": "notifications",
+          "name": "通知中心",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        },
+        {
+          "key": "privacy",
+          "name": "隐私",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        },
+        {
+          "key": "permissions",
+          "name": "权限管理",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        },
+        {
+          "key": "about",
+          "name": "关于",
+          "enabled": true,
+          "needLogin": false,
+          "needVip": false,
+          "tip": ""
+        }
+      ]
+    }
+  ],
+  "global": {
+    "adsEnabled": true,
+    "splashAdEnabled": true,
+    "bannerAdEnabled": true,
+    "feedAdEnabled": true,
+    "vipPriceNote": "会员只为去广告与加速付费，学习功能永久免费",
+    "announcement": "",
+    "announcementUntil": ""
+  }
+}

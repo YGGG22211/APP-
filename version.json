@@ -1,0 +1,9 @@
+{
+  "version": "V29",
+  "code": 29,
+  "apk": "/zhixue-client-v29.apk",
+  "minCode": 12,
+  "force": false,
+  "notes": "新增全局横幅通知（服务器下发实时弹出）· 登录页直接去登录 · 验证码一键自动填入",
+  "size": 0
+}

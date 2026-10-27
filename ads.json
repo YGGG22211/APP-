@@ -1,0 +1,35 @@
+{
+  "updatedAt": null,
+  "ads": [
+    {
+      "id": "splash_vip",
+      "type": "splash",
+      "title": "智学 VIP · 学习更高效",
+      "desc": "开通会员去广告，并解锁全部成长与个性化权益",
+      "image": "",
+      "actionUrl": "zhixue://vip",
+      "weight": 100,
+      "enabled": true
+    },
+    {
+      "id": "banner_tools",
+      "type": "banner",
+      "title": "高效学习工具箱",
+      "desc": "番茄钟 · 倒数日 · 随机抽签 · 单位换算 一站式",
+      "image": "",
+      "actionUrl": "zhixue://tools",
+      "weight": 100,
+      "enabled": true
+    },
+    {
+      "id": "feed_learn",
+      "type": "feed",
+      "title": "错题本帮你提分",
+      "desc": "拍照搜题自动归档，复习提醒不遗漏",
+      "image": "",
+      "actionUrl": "zhixue://wrongbook",
+      "weight": 80,
+      "enabled": true
+    }
+  ]
+}

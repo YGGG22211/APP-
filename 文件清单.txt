@@ -1,0 +1,39 @@
+智学后端 V29 · GitHub 网页上传版（全部文件在根目录，无子文件夹）共 30 个文件
+============================================================
+
+.dockerignore                           0.0 KB   75b09438234e
+API-兼容说明.md                             3.9 KB   17e90046b33b
+Dockerfile                              0.8 KB   eb3191d5ed79
+README.md                               2.5 KB   bec0a3f92245
+TEST-NOW.md                             6.0 KB   460a2996440e
+actions.js                              6.7 KB   a476ac2a4b68
+admin.html                             47.2 KB   fcb520e92722
+ads.json                                0.9 KB   0fcfa7018661
+ai.js                                   7.1 KB   90427ecc7deb
+crypto.js                               1.8 KB   a2b31e21e216
+data-README.md                          0.8 KB   8aa5fc544161
+features.json                           6.6 KB   68f46d8136fe
+mail.js                                 7.0 KB   b8e4989f49fe
+package.json                            0.6 KB   770748920e90
+pay-qrcode.png                        161.3 KB   a123fc69d602
+pay.json                                0.9 KB   4493edce8009
+security.js                             5.9 KB   4c76e72ea97c
+server.js                              67.1 KB   a4df3e07c11c
+sm2.js                                  0.8 KB   2ecc04aa22d3
+start-android-termux.sh                 5.1 KB   1ef609bb021b
+store.js                                3.6 KB   4289ded25020
+util.js                                 1.6 KB   1ac282e9ecf5
+version.json                            0.2 KB   f5ddfa062b71
+使用教程.md                                 7.5 KB   24906980f0ea
+安全加固说明.md                               4.3 KB   f0253ec239db
+广告开通指南.md                               6.6 KB   366b2b90fe5a
+微信云托管部署指南.md                            2.9 KB   c3fa927ce919
+盈利与广告配置.md                              6.8 KB   75a5cac6235c
+跨网络访问方案.md                              5.8 KB   8d3083af713e
+部署教程.md                                18.0 KB   2613986e0b65
+
+为什么是平铺的：GitHub 手机网页上传多选文件不会保留子目录，
+所以把 src/ admin/ 里的文件全部提到根目录，代码路径已同步修改并实测通过。
+
+上传后云托管构建设置：Dockerfile（根目录）· 监听端口 8080 · 环境变量 ADMIN_KEY
+不含 APK（32MB 超 GitHub 网页 25MB 限制），App 内检查更新会 404，其余功能完整。
